@@ -1,0 +1,6 @@
+---
+platform:
+  os: centos8
+  servers:
+    - hostname: vm1
+    - hostname: vm2
