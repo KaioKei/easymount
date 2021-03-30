@@ -1,6 +1,6 @@
 ---
 platform:
-  os: centos8
+  vagrant_box: generic/centos8
   servers:
     - hostname: vm1
     - hostname: vm2
