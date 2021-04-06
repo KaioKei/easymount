@@ -13,7 +13,7 @@ sed -i -e "s+{{EASYMOUNT_ROOT_DIR}}+${CURRENT_DIR}+g" "${ENV_FILE}"
 easymount_cmd="/usr/local/bin/easymount"
 if [ ! -f "${easymount_cmd}" ]; then
   echo ". Install easymount"
-  sudo ln -s "${CURRENT_DIR}/easymount/easymount.py" "${easymount_cmd}"
+  sudo ln -s "${CURRENT_DIR}/easymount.sh" "${easymount_cmd}"
 fi
 
 echo ". Done"

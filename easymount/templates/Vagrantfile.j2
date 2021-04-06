@@ -16,24 +16,23 @@ Vagrant.configure("2") do |config|
 
         # System configuration and network
         server.vm.hostname = "{{ server.hostname }}"
-        server.vm.network "private_network", ip: "192.168.50.{{ loop.index }}"
-        server.vm.box = {{platform.vagrant_box | d('generic/centos8')}}
+        server.vm.network "private_network", ip: "192.168.50.1{{ loop.index }}"
+        server.vm.box = "{{platform.vagrant_box | d('generic/centos8')}}"
         server.vm.box_check_update = false
         server.vm.provider :virtualbox do |v|
+          v.name = "{{server.hostname}}"
           v.gui = false
           v.memory = {{ server.memory | d(platform.memory | d(4096)) }}
           v.cpus = {{ server.vcpu | d(platform.vcpu | d(1)) }}
         end
-        config.disksize.size = '{{ server.disk | d(platform.disk | d(20)) }}GB'
 
         # Provisionning
         ## Network
         {% for server in platform.servers %}
-        server.vm.provision "shell", inline: "echo '192.168.50.{{ loop.index }} {{ server.hostname }}' >> /etc/hosts"
+        server.vm.provision "shell", inline: "echo '192.168.50.1{{ loop.index }} {{ server.hostname }}' >> /etc/hosts"
         {% endfor %}
         ## Fix date time
-        server.vm.provision "shell", inline: "sudo timedatectl set-timezone Europe/Paris"
-        server.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime", run: "always"
+        server.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/{{platform.timezone | d('Europe/Paris')}} /etc/localtime", run: "always"
         ## Authorize vagrant user's SSH key
         server.vm.provision "shell", inline: <<-EOF
         echo 'export LC_ALL=C' >> ~/.bashrc
@@ -53,10 +52,6 @@ Vagrant.configure("2") do |config|
         # Synced folder using vbguest
         server.vm.synced_folder '.', '/vagrant', disabled: true
         server.vm.synced_folder '/tmp/archive-log/storage', '/tmp/archive-logs/storage', create: true
-
-        {#server.vm.provision "shell", inline: "echo 'tmpfs /tmp tmpfs size=4g 0 0' >> /etc/fstab"#}
-        {#server.vm.provision "shell", inline: "sed -i '5,10d' /home/{{platform.vagrant_user | d('vagrant')}}/.bashrc"#}
-        {#server.vm.provision "shell", inline: "sed -i '/{{ server }}/d' /etc/hosts"#}
 
     end
 
