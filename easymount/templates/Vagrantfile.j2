@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
     config.vagrant.plugins = ["vagrant-disksize", "vagrant-vbguest"]
 
     # Get your local SSH public key
-    PUBLIC_KEY = File.read("#{Dir.home}/.ssh/id_rsa.pub")
+    PUBLIC_KEY = File.read("{{platform.ssh_pubkey | d('#{Dir.home}/.ssh/id_rsa.pub') }}")
 
     # Precompile '.vdi' to improve performances
     config.vm.provider "virtualbox" do |vb|
@@ -16,8 +16,9 @@ Vagrant.configure("2") do |config|
 
         # System configuration and network
         server.vm.hostname = "{{ server.hostname }}"
-        server.vm.network "private_network", ip: "192.168.50.1{{ loop.index }}"
-        server.vm.box = "{{platform.vagrant_box | d('generic/centos8')}}"
+        {% set default_ip = ['192.168.50.1', loop.index | string ] | join('') %}
+        server.vm.network "private_network", ip: "{{ server.ip | d(default_ip) }}"
+        server.vm.box = "{{ server.box | d(platform.box) }}"
         server.vm.box_check_update = false
         server.vm.provider :virtualbox do |v|
           v.name = "{{server.hostname}}"
@@ -32,14 +33,14 @@ Vagrant.configure("2") do |config|
         server.vm.provision "shell", inline: "echo '192.168.50.1{{ loop.index }} {{ server.hostname }}' >> /etc/hosts"
         {% endfor %}
         ## Fix date time
-        server.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/{{platform.timezone | d('Europe/Paris')}} /etc/localtime", run: "always"
+        server.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/{{server.timezone | d(platform.timezone | d('Europe/Paris')) }} /etc/localtime", run: "always"
         ## Authorize vagrant user's SSH key
         server.vm.provision "shell", inline: <<-EOF
         echo 'export LC_ALL=C' >> ~/.bashrc
-        echo '#{PUBLIC_KEY}' >> /home/{{platform.vagrant_user | d('vagrant')}}/.ssh/authorized_keys
+        echo '#{PUBLIC_KEY}' >> /home/{{ server.user | d(platform.user | d('vagrant')) }}/.ssh/authorized_keys
         EOF
 
-        {% if (platform.disable_selinux | d(false)) %}
+        {% if ( server.selinux | d(platform.selinux | d(false)) ) %}
         # Disabling SElinux
         server.vm.provision "shell", inline: "sudo sed -i 's/SELINUX=.*/SELINUX=disabled/' /etc/selinux/config"
         server.vm.provision "shell", inline: "sudo setenforce 0"

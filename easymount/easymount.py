@@ -9,11 +9,15 @@ import shutil
 
 import yaml
 from jinja2 import Environment, FileSystemLoader
-import pathlib
+from pathlib import Path
 
-# filenames
+# dirs
+LOG_DIR = "/tmp/easymount"
+
+# names
 VAGRANT_TEMPLATE_NAME = "Vagrantfile.j2"
 VAGRANT_FILE_NAME = "Vagrantfile"
+LOG_FILE_NAME = "output.log"
 
 # env keys
 ENV_TEMPLATES_DIR_KEY = "EASYMOUNT_TEMPLATES_DIR"
@@ -37,7 +41,9 @@ def init_logger(debug: bool):
     level = logging.DEBUG if debug else logging.INFO
     g_logger.setLevel(level)
 
-    output_file_handler = logging.FileHandler("/tmp/easymount/output.log")
+    # log file
+    Path(LOG_DIR).mkdir(parents=True, exist_ok=True)
+    output_file_handler = logging.FileHandler(f"{LOG_DIR}/{LOG_FILE_NAME}")
     stdout_handler = logging.StreamHandler(sys.stdout)
     g_logger.addHandler(output_file_handler)
     g_logger.addHandler(stdout_handler)
@@ -75,7 +81,7 @@ def render_template(yaml_conf):
 
 
 def write_vagrant_file(template_rendering):
-    pathlib.Path(g_vagrant_dir).mkdir(parents=True, exist_ok=True)
+    Path(g_vagrant_dir).mkdir(parents=True, exist_ok=True)
     logging.debug(f"msg=write vagrant file;file={g_vagrant_file}")
     with open(g_vagrant_file, "w") as f:
         f.write(template_rendering)

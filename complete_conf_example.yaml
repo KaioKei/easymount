@@ -1,0 +1,16 @@
+---
+platform:
+  box: generic/centos8 # MANDATORY: vagrant box image
+  user: overrideme # user for all vms
+  memory: 2048 # VRAM for all vms
+  vcpu: 2 # VCPUs for all vms
+  servers:
+    - hostname: master # MANDATORY: hostname
+      user: admin # override global user
+    - hostname: worker1 # MANDATORY: hostname
+      user : guest # override gobal user
+      ip: "192.168.50.42" # override default static ip for this vm
+      memory: 4096 # override global VRAM
+      vcpu: 4 # override global vcpu
+      selinux: true
+
