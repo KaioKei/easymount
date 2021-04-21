@@ -47,7 +47,7 @@ function check_conf_option() {
 }
 
 function configure_vagrant() {
-    echo ". Configure vagrant"
+    echo "Configure vagrant"
     python_cmd="python ${EASYMOUNT_PYTHON_SCRIPT} -c ${conf_file}"
     # output template
     if [ -n "${output_path}" ]; then
@@ -63,13 +63,13 @@ function configure_vagrant() {
 }
 
 function start_vagrant() {
-    echo ". Mount the virtual machines"
+    echo "Mount the virtual machines"
     cd "${EASYMOUNT_VAGRANT_DIR}" || exit
     vagrant up
 }
 
 function stop_vagrant() {
-    echo ". Stop the virtual machines"
+    echo "Stop the virtual machines"
     cd "${EASYMOUNT_VAGRANT_DIR}" || exit
     vagrant halt
 }
@@ -80,13 +80,13 @@ function status_vagrant() {
 }
 
 function destroy_vagrant() {
-    echo ". Delete the virtual machines"
+    echo "Delete the virtual machines"
     cd "${EASYMOUNT_VAGRANT_DIR}" || exit
     vagrant destroy -f
 }
 
 function reload_vagrant() {
-    echo ". Reload the virtual machines"
+    echo "Reload the virtual machines"
     cd "${EASYMOUNT_VAGRANT_DIR}" || exit
     vagrant reload
 }
@@ -203,6 +203,7 @@ elif [ "${mode}" == "reset" ]; then
     start_vagrant
 fi
 
-
-echo ". Done"
-exit 0
+if [ $? == 0 ];then
+  echo "OK"
+fi
+exit $?

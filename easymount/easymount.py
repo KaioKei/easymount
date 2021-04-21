@@ -27,7 +27,7 @@ ENV_VAGRANT_DIR_KEY = "EASYMOUNT_VAGRANT_DIR"
 g_templates_dir: str
 g_vagrant_template: str
 g_vagrant_dir: str
-g_vagrant_file= str
+g_vagrant_file = str
 
 # logger
 g_logger: Logger
@@ -50,7 +50,7 @@ def init_logger(debug: bool):
 
 
 def load_environment():
-    logging.debug(f"msg=load the user's environment")
+    logging.debug(f"Load the user's environment")
     global g_templates_dir
     global g_vagrant_dir
     g_templates_dir = os.getenv(ENV_TEMPLATES_DIR_KEY)
@@ -58,7 +58,7 @@ def load_environment():
 
     # check environment
     if g_templates_dir is None or g_vagrant_dir is None:
-        logging.error("msg=missing environment, execute 'install.sh'")
+        logging.error("Missing environment, execute 'install.sh'")
         sys.exit(1)
     else:
         global g_vagrant_template
@@ -68,13 +68,17 @@ def load_environment():
 
 
 def load_configuration(configuration: str):
+    conf_path = Path(configuration)
+    if not conf_path.is_file():
+        logging.error(f"FATAL ! Missing configuration file : {configuration}")
+        sys.exit(1)
     with open(configuration, 'r') as f:
-        logging.debug(f"msg=load configuration file;file={configuration}")
+        logging.debug(f"Load configuration file : {configuration}")
         return yaml.safe_load(f)
 
 
 def render_template(yaml_conf):
-    logging.debug(f"msg=render vagrant file template;file={g_vagrant_file}")
+    logging.debug(f"Render vagrant file template : {g_vagrant_file}")
     env = Environment(loader=FileSystemLoader(g_templates_dir), trim_blocks=True, lstrip_blocks=True)
     template = env.get_template(VAGRANT_TEMPLATE_NAME)
     return template.render(yaml_conf)
@@ -82,7 +86,7 @@ def render_template(yaml_conf):
 
 def write_vagrant_file(template_rendering):
     Path(g_vagrant_dir).mkdir(parents=True, exist_ok=True)
-    logging.debug(f"msg=write vagrant file;file={g_vagrant_file}")
+    logging.debug(f"Write vagrant file : {g_vagrant_file}")
     with open(g_vagrant_file, "w") as f:
         f.write(template_rendering)
 
@@ -111,5 +115,3 @@ if __name__ == "__main__":
 
     if args.output is not None:
         copy_vagrant_file(str(args.output))
-
-
