@@ -19,8 +19,8 @@ function usage(){
     easymount [mode] [options]
 
     [mode]
-    mount [conf]\tMount the VMs from the given configuration file
-    configure [conf]\tOnly Generate the vagrant file from the given configuration file, for debug purposes
+    mount\tMount the VMs from the given configuration file
+    configure\tOnly Generate the vagrant file from the given configuration file, for debug purposes
 
     [other modes]
     start\tStart the VMs from the last generated vagrant file, and reload the vms if needed
@@ -33,8 +33,14 @@ function usage(){
     [options]
     -c | --conf [file]\tConfiguration file for the VMs to mount
     -o | --output [path]\tExport the current generated vagrant file into the given path
+
+    [examples]
+    # Create Vagrant file and start VMs :
+    easymount mount -c simple_conf_example.yaml
+
+    # Create Vagrant file and export output :
+    easymount configure -c simple_conf_example.yaml -o /tmp
     "
-    echo "usage"
 }
 
 # check if configuration is provided
