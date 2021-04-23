@@ -9,7 +9,6 @@ Environment :
 | **Package** | **Version** |
 | --- | --- |
 | Python | \>= 3.8.5 |
-| Pip | \>= 21.0.1 |
 | VirtualBox | \>= 6.1.18 |
 
 Python modules :
