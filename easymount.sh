@@ -191,6 +191,9 @@ if [ "${mode}" == "mount" ]; then
     check_conf_option
     configure_vagrant
     start_vagrant
+    echo ""
+    echo "Copy in your /etc/hosts:"
+    cat "${EASYMOUNT_ROOT_DIR}/.hosts"
 elif [ "${mode}" == "configure" ]; then
     check_conf_option
     configure_vagrant

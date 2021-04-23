@@ -6,6 +6,7 @@ import argparse
 import logging
 from logging import Logger
 import shutil
+from typing import List
 
 import yaml
 from jinja2 import Environment, FileSystemLoader
@@ -18,10 +19,15 @@ LOG_DIR = "/tmp/easymount"
 VAGRANT_TEMPLATE_NAME = "Vagrantfile.j2"
 VAGRANT_FILE_NAME = "Vagrantfile"
 LOG_FILE_NAME = "output.log"
+HOSTS_FILE_NAME = ".hosts"
 
 # env keys
 ENV_TEMPLATES_DIR_KEY = "EASYMOUNT_TEMPLATES_DIR"
 ENV_VAGRANT_DIR_KEY = "EASYMOUNT_VAGRANT_DIR"
+ENV_EASYMOUNT_ROOT_DIR = "EASYMOUNT_ROOT_DIR"
+
+# others
+IP_PATTERN = "192.168.50.1"
 
 # global env variables
 g_templates_dir: str
@@ -91,6 +97,18 @@ def write_vagrant_file(template_rendering):
         f.write(template_rendering)
 
 
+def persist_etc_hosts(yaml_conf: dict):
+    hosts_file = f"{os.getenv(ENV_EASYMOUNT_ROOT_DIR)}/{HOSTS_FILE_NAME}"
+    server_list: List = yaml_conf.get("platform").get("servers")
+    with open(hosts_file, 'w') as f:
+        host_count = 1
+        for server_conf in server_list:
+            hostname = server_conf.get("hostname")
+            ip = server_conf.get("ip") if "ip" in server_conf else IP_PATTERN + str(host_count)
+            f.write(f"{ip} {hostname}\n")
+            host_count += 1
+
+
 def copy_vagrant_file(output_path: str):
     shutil.copy(g_vagrant_file, output_path)
 
@@ -112,6 +130,7 @@ if __name__ == "__main__":
     yaml_configuration = load_configuration(args.configuration)
     vagrant_file_render = render_template(yaml_configuration)
     write_vagrant_file(vagrant_file_render)
+    persist_etc_hosts(yaml_configuration)
 
     if args.output is not None:
         copy_vagrant_file(str(args.output))

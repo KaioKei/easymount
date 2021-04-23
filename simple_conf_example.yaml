@@ -3,4 +3,4 @@ platform:
   box: generic/centos8
   servers:
     - hostname: vm1
-#    - hostname: vm2
+    - hostname: vm2

@@ -37,6 +37,7 @@ Vagrant.configure("2") do |config|
         ## Authorize vagrant user's SSH key
         server.vm.provision "shell", inline: <<-EOF
         echo 'export LC_ALL=C' >> ~/.bashrc
+        mkdir -p /home/{{ server.user | d(platform.user | d('vagrant')) }}/.ssh
         echo '#{PUBLIC_KEY}' >> /home/{{ server.user | d(platform.user | d('vagrant')) }}/.ssh/authorized_keys
         EOF
 
